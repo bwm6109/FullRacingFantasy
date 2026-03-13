@@ -1,0 +1,165 @@
+/* Base Styles */
+body {
+    font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.App {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.app-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* Scraper Card Styles */
+.scraper-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.scraper-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+button {
+    padding: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #94c2ed;
+    cursor: not-allowed;
+}
+
+/* Message Feedback Styles */
+.message-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.message-box.loading {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.message-box.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.message-box.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Draft Room Styles */
+.draft-room-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.draft-controls {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.draft-controls .input-group {
+    flex: 1;
+}
+
+select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    background-color: white;
+}
+
+.athlete-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.athlete-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.athlete-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.athlete-info strong {
+    font-size: 16px;
+    color: #212529;
+}
+
+.athlete-info span {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.draft-btn {
+    padding: 8px 16px;
+    background-color: #28a745;
+    font-size: 14px;
+}
+
+.draft-btn:hover {
+    background-color: #218838;
+}
