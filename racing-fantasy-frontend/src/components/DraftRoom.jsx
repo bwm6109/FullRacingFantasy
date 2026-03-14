@@ -147,7 +147,7 @@ export default function DraftRoom() {
 
     return (
         <div className="draft-room-card">
-            <h2>🎯 Draft Room</h2>
+            <h2>Draft Room</h2>
 
             <div className="draft-summary">
                 <p><strong>Teams loaded:</strong> {teams.length}</p>
@@ -211,7 +211,7 @@ export default function DraftRoom() {
                                 : ' Try a different search.'}
                         </p>
                     ) : (
-                        filteredAthletes.slice(0, 100).map((athlete) => {
+                        filteredAthletes.slice(0, 400).map((athlete) => {
                             const takenInfo = takenAthletesInLeague.get(athlete.id);
                             const isTakenByOtherTeam =
                                 takenInfo &&

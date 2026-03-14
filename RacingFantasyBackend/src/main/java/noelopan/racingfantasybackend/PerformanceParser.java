@@ -39,13 +39,13 @@ public class PerformanceParser {
             if (numberMatcher.find()) {
                 double parsedValue = Double.parseDouble(numberMatcher.group(1));
 
-                // Jumps and vaults use centimeters for your scoring constants
-                if (eventName != null) {
-                    String upperEvent = eventName.toUpperCase();
-                    if (upperEvent.contains("JUMP") || upperEvent.contains("VAULT")) {
-                        return parsedValue * 100.0;
-                    }
-                }
+//                // Jumps and vaults use centimeters for your scoring constants
+//                if (eventName != null) {
+//                    String upperEvent = eventName.toUpperCase();
+//                    if (upperEvent.contains("JUMP") || upperEvent.contains("VAULT")) {
+//                        return parsedValue * 100.0;
+//                    }
+//                }
 
                 return parsedValue;
             }

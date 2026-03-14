@@ -71,7 +71,7 @@ export default function TeamRoster() {
 
     return (
         <div className="roster-card">
-            <h2>📋 Team Roster & Scores</h2>
+            <h2>Team Roster & Scores</h2>
 
             <div className="roster-controls">
                 <div className="input-group">

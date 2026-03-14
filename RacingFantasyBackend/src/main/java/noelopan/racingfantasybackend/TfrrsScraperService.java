@@ -115,14 +115,14 @@ public class TfrrsScraperService {
                     String place = columns.get(0).text().trim();
                     String athleteName = columns.get(1).text().trim();
                     String year = columns.get(2).text().trim();
-                    String school = columns.get(3).text().trim();
+                    String school = normalizeSchoolName(columns.get(3).text().trim());
                     String rawMark = columns.get(timeOrMarkIndex).text().trim();
 
                     if (year.isEmpty() || school.equalsIgnoreCase("Unattached") || athleteName.isEmpty()) {
                         continue;
                     }
 
-                    Athlete athlete = athleteRepository.findByNameAndSchool(athleteName, school)
+                    Athlete athlete = athleteRepository.findByNameIgnoreCaseAndSchoolIgnoreCase(athleteName, school)
                             .orElseGet(() -> {
                                 Athlete newAthlete = new Athlete();
                                 newAthlete.setName(athleteName);
@@ -189,7 +189,7 @@ public class TfrrsScraperService {
                     .timeout(10000)
                     .get();
 
-            String schoolName = extractSchoolName(doc);
+            String schoolName = normalizeSchoolName(extractSchoolName(doc));
             Elements athleteLinks = doc.select("a[href*=/athletes/]");
 
             Set<String> processedUrls = new HashSet<>();
@@ -210,7 +210,7 @@ public class TfrrsScraperService {
                     continue;
                 }
 
-                Athlete athlete = athleteRepository.findByNameAndSchool(athleteName, schoolName)
+                Athlete athlete = athleteRepository.findByNameIgnoreCaseAndSchoolIgnoreCase(athleteName, schoolName)
                         .orElseGet(() -> {
                             Athlete newAthlete = new Athlete();
                             newAthlete.setName(athleteName);
@@ -291,6 +291,11 @@ public class TfrrsScraperService {
             return;
         }
 
+        String cleanedMark = extractCleanPerformanceMark(mark);
+        if (cleanedMark == null || cleanedMark.isBlank()) {
+            return;
+        }
+
         TrackEventConstants eventConstants;
         try {
             eventConstants = TrackEventConstants.valueOf(enumEventName);
@@ -298,7 +303,7 @@ public class TfrrsScraperService {
             return;
         }
 
-        Double decimalMark = PerformanceParser.parseMarkToDecimal(mark, enumEventName);
+        Double decimalMark = PerformanceParser.parseMarkToDecimal(cleanedMark, enumEventName);
         if (decimalMark == null) {
             return;
         }
@@ -322,7 +327,7 @@ public class TfrrsScraperService {
             );
         }
 
-        athlete.trySetBestEventAndPoints(enumEventName, mark, points);
+        athlete.trySetBestEventAndPoints(enumEventName, cleanedMark, points);
     }
 
     private String extractSchoolName(Document doc) {
@@ -495,4 +500,66 @@ public class TfrrsScraperService {
                 || enumEventName.contains("HEPTATHLON")
                 || enumEventName.contains("DECATHLON"));
     }
+
+    private String extractCleanPerformanceMark(String rawMark) {
+        if (rawMark == null) {
+            return null;
+        }
+
+        String clean = rawMark.trim().toUpperCase().replace('\u00A0', ' ');
+        if (clean.isBlank()) {
+            return null;
+        }
+
+        // Reject non-performances immediately
+        if (containsNonPerformance(clean)) {
+            return null;
+        }
+
+        // Prefer a time first: 1:52.33, 14:35.24, etc.
+        java.util.regex.Matcher timeMatcher =
+                java.util.regex.Pattern.compile("(\\d+:\\d+(?:\\.\\d+)?)").matcher(clean);
+
+        if (timeMatcher.find()) {
+            return timeMatcher.group(1);
+        }
+
+        // Then prefer a metric mark with unit: 4.24m, 6.85m, etc.
+        java.util.regex.Matcher metricMatcher =
+                java.util.regex.Pattern.compile("(\\d+(?:\\.\\d+)?\\s*M)\\b").matcher(clean);
+
+        if (metricMatcher.find()) {
+            return metricMatcher.group(1).replaceAll("\\s+", "");
+        }
+
+        // Then fallback to first plain number: 12.24, 46.88, etc.
+        java.util.regex.Matcher numberMatcher =
+                java.util.regex.Pattern.compile("(\\d+(?:\\.\\d+)?)").matcher(clean);
+
+        if (numberMatcher.find()) {
+            return numberMatcher.group(1);
+        }
+
+        return null;
+    }
+
+    private boolean containsNonPerformance(String text) {
+        return text.contains("DNF")
+                || text.contains("DNS")
+                || text.contains("DQ")
+                || text.contains("NH")
+                || text.contains("NM")
+                || text.contains("FOUL")
+                || text.equals("FS");
+    }
+
+    private String normalizeSchoolName(String school) {
+        if (school == null) {
+            return "";
+        }
+
+        String cleaned = school.trim().toUpperCase();
+        return cleaned;
+    }
+
 }

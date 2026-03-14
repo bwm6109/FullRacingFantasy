@@ -123,7 +123,7 @@ export default function LeagueManager() {
 
     return (
         <div className="league-card">
-            <h2>🌍 League Hub</h2>
+            <h2>League Hub</h2>
 
             {message && <div className="message-box">{message}</div>}
 
@@ -232,7 +232,7 @@ export default function LeagueManager() {
 
             {/* LEADERBOARD SECTION */}
             <div className="leaderboard-section">
-                <h3>🏆 League Leaderboard</h3>
+                <h3>League Leaderboard</h3>
 
                 <div className="leaderboard-controls">
                     <select

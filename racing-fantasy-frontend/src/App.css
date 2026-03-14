@@ -224,11 +224,11 @@ button:disabled {
 }
 
 .join-btn {
-    background-color: #0f766e;
+    background-color: var(--primary);
 }
 
 .join-btn:hover:not(:disabled) {
-    background-color: #115e59;
+    background-color: var(--primary-hover);
 }
 
 .refresh-btn {

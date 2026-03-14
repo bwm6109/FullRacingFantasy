@@ -9,7 +9,7 @@ function App() {
     return (
         <div className="App">
             <header className="app-header">
-                <h1>🏆 Track & Field Fantasy</h1>
+                <h1>Fantasy Track & Field</h1>
             </header>
 
             <main className="app-content">

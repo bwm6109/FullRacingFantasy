@@ -81,7 +81,7 @@ export default function UserTeamManager() {
 
     return (
         <div className="user-team-card">
-            <h2>👤 User & Team Setup</h2>
+            <h2>User & Team Setup</h2>
 
             {message && <div className="message-box">{message}</div>}
 
@@ -96,13 +96,13 @@ export default function UserTeamManager() {
                             onChange={(e) => setUsername(e.target.value)}
                             required
                         />
-                        <input
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
+                        {/*<input*/}
+                        {/*    type="email"*/}
+                        {/*    placeholder="Email"*/}
+                        {/*    value={email}*/}
+                        {/*    onChange={(e) => setEmail(e.target.value)}*/}
+                        {/*    required*/}
+                        {/*/>*/}
                         <button type="submit" className="action-btn">
                             Create User
                         </button>
