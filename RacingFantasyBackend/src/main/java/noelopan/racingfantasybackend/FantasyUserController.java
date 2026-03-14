@@ -56,4 +56,10 @@ public class FantasyUserController {
         userRepository.deleteById(id);
         return ResponseEntity.ok("Successfully deleted user with ID: " + id);
     }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteAllUsers() {
+        userRepository.deleteAll();
+        return ResponseEntity.ok("Successfully deleted all users");
+    }
 }

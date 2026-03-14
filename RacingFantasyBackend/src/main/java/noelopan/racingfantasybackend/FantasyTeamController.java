@@ -170,4 +170,10 @@ public class FantasyTeamController {
     public List<FantasyTeam> getAllTeams() {
         return teamRepository.findAll();
     }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteAllTeams() {
+        teamRepository.deleteAll();
+        return ResponseEntity.ok("Successfully deleted all teams");
+    }
 }

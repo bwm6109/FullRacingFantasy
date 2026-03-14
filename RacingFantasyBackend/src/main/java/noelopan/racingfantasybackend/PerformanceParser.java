@@ -1,42 +1,61 @@
 package noelopan.racingfantasybackend;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class PerformanceParser {
+
+    private static final Pattern TIME_PATTERN = Pattern.compile("(\\d+:\\d+(?:\\.\\d+)?)");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("(\\d+(?:\\.\\d+)?)");
 
     public static Double parseMarkToDecimal(String rawMark, String eventName) {
         if (rawMark == null || rawMark.trim().isEmpty()) {
             return null;
         }
 
-        String cleanMark = rawMark.trim().toUpperCase();
+        String cleanMark = rawMark.trim().toUpperCase().replace('\u00A0', ' ');
 
-        // 1. Handle non-performances (Returns null so we don't calculate points for them)
+        // Handle non-performances
         if (cleanMark.equals("DNS") || cleanMark.equals("DNF") ||
                 cleanMark.equals("DQ") || cleanMark.equals("FS") ||
-                cleanMark.equals("NM") || cleanMark.equals("FOUL") || cleanMark.equals("NH")) {
+                cleanMark.equals("NM") || cleanMark.equals("FOUL") ||
+                cleanMark.equals("NH")) {
             return null;
         }
 
-        // 2. Strip out any "m" or "meters" text if TFRRS includes it for field events
-        cleanMark = cleanMark.replace("M", "").trim();
-
         try {
-            // 3. Handle Distance/Mid-Distance Times (e.g., "14:35.24" or "4:05.00")
-            if (cleanMark.contains(":")) {
-                String[] parts = cleanMark.split(":");
+            // 1. Try to extract a time first (for track events)
+            Matcher timeMatcher = TIME_PATTERN.matcher(cleanMark);
+            if (timeMatcher.find()) {
+                String timeText = timeMatcher.group(1);
+                String[] parts = timeText.split(":");
                 double minutes = Double.parseDouble(parts[0]);
                 double seconds = Double.parseDouble(parts[1]);
                 return (minutes * 60) + seconds;
             }
-            // 4. Handle Sprints and Field Marks (e.g., "10.55" or "7.24")
-            else {
-                if(eventName.contains("JUMP") || eventName.contains("VAULT")) {
-                    return 100 * Double.parseDouble(cleanMark);
+
+            // 2. Otherwise extract the first plain number
+            Matcher numberMatcher = NUMBER_PATTERN.matcher(cleanMark);
+            if (numberMatcher.find()) {
+                double parsedValue = Double.parseDouble(numberMatcher.group(1));
+
+                // Jumps and vaults use centimeters for your scoring constants
+                if (eventName != null) {
+                    String upperEvent = eventName.toUpperCase();
+                    if (upperEvent.contains("JUMP") || upperEvent.contains("VAULT")) {
+                        return parsedValue * 100.0;
+                    }
                 }
-                return Double.parseDouble(cleanMark);
+
+                return parsedValue;
             }
+
         } catch (NumberFormatException e) {
             System.err.println("Warning: Could not parse TFRRS mark into decimal: " + rawMark);
-            return null; // Return null if it's a completely unrecognized string
+            return null;
         }
+
+        System.err.println("Warning: Could not find a usable mark in: " + rawMark);
+        return null;
     }
 }

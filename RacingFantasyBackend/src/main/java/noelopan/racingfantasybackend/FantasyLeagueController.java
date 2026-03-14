@@ -125,4 +125,19 @@ public class FantasyLeagueController {
 
         return ResponseEntity.ok(leaderboard);
     }
+
+    /**
+     * GET /api/leagues
+     * Returns a list of all fantasy leagues.
+     */
+    @GetMapping
+    public List<FantasyLeague> getAllLeagues() {
+        return leagueRepository.findAll();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteAllLeagues() {
+        leagueRepository.deleteAll();
+        return ResponseEntity.ok("Successfully deleted all leagues");
+    }
 }

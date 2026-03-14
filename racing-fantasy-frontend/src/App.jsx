@@ -1,5 +1,8 @@
 import ScraperDashboard from './components/ScraperDashboard';
 import DraftRoom from './components/DraftRoom';
+import TeamRoster from './components/TeamRoster';
+import LeagueManager from './components/LeagueManager';
+import UserTeamManager from './components/UserTeamManager';
 import './App.css';
 
 function App() {
@@ -10,9 +13,19 @@ function App() {
             </header>
 
             <main className="app-content">
+                <UserTeamManager />
+                <div style={{ marginTop: '40px' }}></div>
+
                 <ScraperDashboard />
-                <div style={{ marginTop: '40px' }}></div> {/* Spacer */}
+                <div style={{ marginTop: '40px' }}></div>
+
                 <DraftRoom />
+                <div style={{ marginTop: '40px' }}></div>
+
+                <TeamRoster />
+                <div style={{ marginTop: '40px' }}></div>
+
+                <LeagueManager />
             </main>
         </div>
     );
