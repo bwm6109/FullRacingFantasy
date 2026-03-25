@@ -23,6 +23,7 @@ public class Performance {
     private double pointsMultiplier;
     private double fantasyPoints;
     private Integer weekNumber;
+    private String athleteName;
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
@@ -58,6 +59,7 @@ public class Performance {
 
     public void setAthlete(Athlete athlete) {
         this.athlete = athlete;
+        this.athleteName = athlete.getName();
     }
 
     public void setYear(String year) {
@@ -127,5 +129,9 @@ public class Performance {
 
     public Integer getWeekNumber(){
         return weekNumber;
+    }
+
+    public String getAthleteName() {
+        return athleteName;
     }
 }
