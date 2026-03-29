@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface AthleteRepository extends JpaRepository<Athlete, Long> {
     // This custom method lets the scraper look up an athlete by name and school
     Optional<Athlete> findByNameIgnoreCaseAndSchoolIgnoreCase(String name, String school);
+    Optional<Athlete> findByTfrrsId(int id);
 }

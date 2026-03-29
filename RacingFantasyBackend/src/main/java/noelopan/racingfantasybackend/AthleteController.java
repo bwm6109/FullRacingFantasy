@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/athletes")
@@ -26,6 +27,18 @@ public class AthleteController {
     public ResponseEntity<String> deleteAllAthletes() {
         athleteRepository.deleteAll();
         return ResponseEntity.ok("All athletes have been wiped clean.");
+    }
+
+    @DeleteMapping("/{tfrrsId}")
+    public ResponseEntity<Athlete> deleteAthlete(@PathVariable long tfrrsId) {
+            Optional<Athlete> deletingAthlete = athleteRepository.findById(tfrrsId);
+            if(deletingAthlete.isEmpty()) {
+                System.out.println("athlete is empty");
+                return ResponseEntity.notFound().build();
+            }
+            Athlete athlete = deletingAthlete.get();
+        athleteRepository.delete(athlete);
+        return ResponseEntity.ok(athlete);
     }
 
     /**

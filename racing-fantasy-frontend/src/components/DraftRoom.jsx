@@ -130,6 +130,15 @@ export default function DraftRoom() {
                 );
             })
             .sort((a, b) => {
+                const aTaken = takenAthletesInLeague.has(a.id);
+                const bTaken = takenAthletesInLeague.has(b.id);
+
+                // 1. Push taken athletes to the bottom
+                if (aTaken !== bTaken) {
+                    return aTaken ? 1 : -1; // taken = lower priority
+                }
+
+                // 2. Then sort by fantasy points
                 const aValue = a?.bestEventFantasyPoints ?? -1;
                 const bValue = b?.bestEventFantasyPoints ?? -1;
 
@@ -137,6 +146,7 @@ export default function DraftRoom() {
                     return bValue - aValue;
                 }
 
+                // 3. Then by name
                 const aName = a?.name || '';
                 const bName = b?.name || '';
                 return aName.localeCompare(bName);
