@@ -91,4 +91,34 @@ public class AthleteController {
 
         return ResponseEntity.ok("Successfully imported " + successCount + " roster(s).");
     }
+
+    @GetMapping("/{id}/score")
+    public ResponseEntity<Double> getAthleteScoreForWeek(
+            @PathVariable Long id,
+            @RequestParam Integer week) {
+
+        Optional<Athlete> athleteOpt = athleteRepository.findById(id);
+
+        if (athleteOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Athlete athlete = athleteOpt.get();
+        double totalScore = 0.0;
+
+
+        // Loop through all their performances
+        for (Performance perf : athlete.getPerformances()) {
+
+            // If the performance happened in the requested week, add it to the total
+            if (perf.getWeekNumber() != null && perf.getWeekNumber().equals(week)) {
+                totalScore += perf.getFantasyPoints();
+            }
+        }
+
+        // Round the final team score to 2 decimal places to keep it clean
+        totalScore = Math.round(totalScore * 100.0) / 100.0;
+
+        return ResponseEntity.ok(totalScore);
+    }
 }

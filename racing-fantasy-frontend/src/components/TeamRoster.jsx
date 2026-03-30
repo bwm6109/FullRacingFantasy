@@ -6,16 +6,17 @@ export default function TeamRoster() {
     const [selectedTeamId, setSelectedTeamId] = useState('');
     const [teamData, setTeamData] = useState(null);
     const [teamScore, setTeamScore] = useState(0);
+    const [athleteScores, setAthleteScores] = useState({});
     const [weekNumber, setWeekNumber] = useState(1);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // 1. Fetch the list of teams when the component loads
     useEffect(() => {
         const fetchTeams = async () => {
             try {
                 const response = await axios.get('http://localhost:8080/api/teams');
                 setTeams(response.data);
+
                 if (response.data.length > 0) {
                     setSelectedTeamId(response.data[0].id);
                 }
@@ -23,25 +24,51 @@ export default function TeamRoster() {
                 console.error("Error fetching teams:", error);
             }
         };
+
         fetchTeams();
     }, []);
 
-    // 2. Fetch specific team roster and score whenever the team or week changes
     useEffect(() => {
         if (!selectedTeamId) return;
 
         const fetchTeamDetails = async () => {
             setLoading(true);
             setMessage('');
+
             try {
-                // Run both API calls at the same time for speed
                 const [rosterRes, scoreRes] = await Promise.all([
                     axios.get(`http://localhost:8080/api/teams/${selectedTeamId}`),
                     axios.get(`http://localhost:8080/api/teams/${selectedTeamId}/score?week=${weekNumber}`)
                 ]);
 
-                setTeamData(rosterRes.data);
+                const rosterData = rosterRes.data;
+                setTeamData(rosterData);
                 setTeamScore(scoreRes.data);
+
+                if (rosterData.roster && rosterData.roster.length > 0) {
+                    const scoreRequests = rosterData.roster.map(async (athlete) => {
+                        try {
+                            const res = await axios.get(
+                                `http://localhost:8080/api/athletes/${athlete.id}/score?week=${weekNumber}`
+                            );
+                            return { athleteId: athlete.id, score: res.data };
+                        } catch (error) {
+                            console.error(`Error fetching score for ${athlete.name}:`, error);
+                            return { athleteId: athlete.id, score: 0 };
+                        }
+                    });
+
+                    const scoreResults = await Promise.all(scoreRequests);
+
+                    const scoreMap = {};
+                    scoreResults.forEach(({ athleteId, score }) => {
+                        scoreMap[athleteId] = score;
+                    });
+
+                    setAthleteScores(scoreMap);
+                } else {
+                    setAthleteScores({});
+                }
             } catch (error) {
                 console.error("Error fetching team details:", error);
                 setMessage("❌ Failed to load team data.");
@@ -53,17 +80,21 @@ export default function TeamRoster() {
         fetchTeamDetails();
     }, [selectedTeamId, weekNumber]);
 
-    // 3. Handle dropping an athlete
     const handleDrop = async (athleteId, athleteName) => {
         try {
             await axios.delete(`http://localhost:8080/api/teams/${selectedTeamId}/roster/${athleteId}`);
             setMessage(`✅ Dropped ${athleteName} from the roster.`);
 
-            // Remove the athlete from the UI immediately without reloading the page
             setTeamData(prevData => ({
                 ...prevData,
                 roster: prevData.roster.filter(athlete => athlete.id !== athleteId)
             }));
+
+            setAthleteScores(prevScores => {
+                const updatedScores = { ...prevScores };
+                delete updatedScores[athleteId];
+                return updatedScores;
+            });
         } catch (error) {
             setMessage(`❌ Error dropping athlete: ${error.response?.data || "Unknown error"}`);
         }
@@ -96,7 +127,7 @@ export default function TeamRoster() {
                         min="1"
                         max="20"
                         value={weekNumber}
-                        onChange={(e) => setWeekNumber(e.target.value)}
+                        onChange={(e) => setWeekNumber(Number(e.target.value))}
                     />
                 </div>
             </div>
@@ -108,7 +139,10 @@ export default function TeamRoster() {
             ) : teamData ? (
                 <>
                     <div className="scoreboard">
-                        <h3>Total Points (Week {weekNumber}): <span className="highlight-score">{teamScore}</span></h3>
+                        <h3>
+                            Total Points (Week {weekNumber}):{' '}
+                            <span className="highlight-score">{teamScore}</span>
+                        </h3>
                     </div>
 
                     <div className="athlete-grid">
@@ -120,7 +154,11 @@ export default function TeamRoster() {
                                     <div className="athlete-info">
                                         <strong>{athlete.name}</strong>
                                         <span>{athlete.school}</span>
+                                        <span className="athlete-week-score">
+                                            Week {weekNumber} Points: {athleteScores[athlete.id] ?? 0}
+                                        </span>
                                     </div>
+
                                     <button
                                         onClick={() => handleDrop(athlete.id, athlete.name)}
                                         className="drop-btn"

@@ -59,6 +59,9 @@ public class TfrrsScraperService {
 
                 boolean isPrelim = eventName.toUpperCase().contains("PRELIM");
                 boolean isFinal = eventName.toUpperCase().contains("FINAL");
+                if(eventName.contains(",")){
+                    eventName = eventName.replace(",", "");
+                }
                 if(eventName.contains("FINALS")){
                     eventName = eventName.replace(" FINALS","");
                 }else if(eventName.contains("PRELIMINARIES")){
