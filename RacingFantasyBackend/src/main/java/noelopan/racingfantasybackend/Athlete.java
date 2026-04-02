@@ -20,6 +20,7 @@ public class Athlete {
     private Integer bestEventPoints;
     private double bestEventFantasyPoints;
     private String tfrrsUrl;
+    private int leaguePoints = 0;
 
     @OneToMany(mappedBy = "athlete", cascade = CascadeType.ALL)
     private List<Performance> performances;
@@ -63,5 +64,11 @@ public class Athlete {
             this.bestEventPoints = points;
             this.bestEventFantasyPoints = points / 50.0;
         }
+    }
+    public int getLeaguePoints(){
+        return leaguePoints;
+    }
+    public void incrementLeaguePoints(int points){
+        leaguePoints += points;
     }
 }

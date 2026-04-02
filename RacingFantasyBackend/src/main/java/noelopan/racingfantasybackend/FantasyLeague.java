@@ -19,6 +19,8 @@ public class FantasyLeague {
     private String division;
     private String conference;
     private String gender;
+    private int qualifyingCount;
+    private int rosterSize;
 
     @OneToMany(mappedBy = "league", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("league")
@@ -44,4 +46,10 @@ public class FantasyLeague {
 
     public List<FantasyTeam> getTeams() { return teams; }
     public void setTeams(List<FantasyTeam> teams) { this.teams = teams; }
+
+    public int getQualifyingCount() { return qualifyingCount; }
+    public void setQualifyingCount(int qualifyingCount) { this.qualifyingCount = qualifyingCount; }
+
+    public int getRosterSize() { return rosterSize; }
+    public void setRosterSize(int rosterSize) { this.rosterSize = rosterSize; }
 }

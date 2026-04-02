@@ -59,19 +59,19 @@ public class TfrrsScraperService {
 
                 boolean isPrelim = eventName.toUpperCase().contains("PRELIM");
                 boolean isFinal = eventName.toUpperCase().contains("FINAL");
-                if(eventName.contains(",")){
+                if (eventName.contains(",")) {
                     eventName = eventName.replace(",", "");
                 }
-                if(eventName.contains("FINALS")){
-                    eventName = eventName.replace(" FINALS","");
-                }else if(eventName.contains("PRELIMINARIES")){
-                    eventName = eventName.replace(" PRELIMINARIES","");
-                }else if(eventName.contains("FINAL")){
-                    eventName = eventName.replace(" FINAL","");
-                }else if(eventName.contains("PRELIMS")){
-                    eventName = eventName.replace(" PRELIMS","");
-                }else if(eventName.contains("PRELIM")){
-                    eventName = eventName.replace(" PRELIM","");
+                if (eventName.contains("FINALS")) {
+                    eventName = eventName.replace(" FINALS", "");
+                } else if (eventName.contains("PRELIMINARIES")) {
+                    eventName = eventName.replace(" PRELIMINARIES", "");
+                } else if (eventName.contains("FINAL")) {
+                    eventName = eventName.replace(" FINAL", "");
+                } else if (eventName.contains("PRELIMS")) {
+                    eventName = eventName.replace(" PRELIMS", "");
+                } else if (eventName.contains("PRELIM")) {
+                    eventName = eventName.replace(" PRELIM", "");
                 }
 
                 String eventConstantsName = EventMatcher.matchEvent(eventName);
@@ -170,52 +170,52 @@ public class TfrrsScraperService {
                         continue;
                     }
 
-                        if(isPrelim || isFinal) {
-                            System.out.println(eventName);
-                            Optional<Performance> testPerf = performanceRepository.findByAthleteAndEventNameIgnoreCaseAndWeekNumber(athlete, eventName, weekNumber);
-                            if (testPerf.isPresent()) {
-                                System.out.println(testPerf.get());
-                                System.out.println(testPerf.get().getPoints());
-                            }
-                            Performance perf = performanceRepository.findByAthleteAndEventNameIgnoreCaseAndWeekNumber(athlete, eventConstantsName, weekNumber)
-                                    .orElseGet(() ->{
-                                        Performance newPerf = new Performance();
-                                        if(isFinal){
-                                            newPerf.setPlace(place);
-                                        }
-                                        newPerf.setEventName(eventConstantsName);
-                                        newPerf.setAthlete(athlete);
-                                        newPerf.setYear(year);
-                                        newPerf.setSchool(school);
-                                        newPerf.setDisplayMark(rawMark);
-                                        newPerf.setDecimalMark(decimalMark);
-                                        newPerf.setPoints(points);
-                                        newPerf.setWeekNumber(weekNumber);
-                                        return performanceRepository.save(newPerf);
-                                    });
-                            if(isFinal){
-                                perf.setPlace(place);
-                            }
-                            if(points > perf.getPoints()){
-                                perf.setPoints(points);
-                                perf.setDecimalMark(decimalMark);
-                                perf.setDisplayMark(rawMark);
-                            }
-                            performanceRepository.save(perf);
-                        }else {
-                            Performance perf = new Performance();
-                            perf.setEventName(eventConstantsName);
-                            perf.setPlace(place);
-                            perf.setAthlete(athlete);
-                            perf.setYear(year);
-                            perf.setSchool(school);
-                            perf.setDisplayMark(rawMark);
-                            perf.setDecimalMark(decimalMark);
-                            perf.setPoints(points);
-                            perf.setWeekNumber(weekNumber);
-
-                            performanceRepository.save(perf);
+                    if (isPrelim || isFinal) {
+                        System.out.println(eventName);
+                        Optional<Performance> testPerf = performanceRepository.findByAthleteAndEventNameIgnoreCaseAndWeekNumber(athlete, eventName, weekNumber);
+                        if (testPerf.isPresent()) {
+                            System.out.println(testPerf.get());
+                            System.out.println(testPerf.get().getPoints());
                         }
+                        Performance perf = performanceRepository.findByAthleteAndEventNameIgnoreCaseAndWeekNumber(athlete, eventConstantsName, weekNumber)
+                                .orElseGet(() -> {
+                                    Performance newPerf = new Performance();
+                                    if (isFinal) {
+                                        newPerf.setPlace(place);
+                                    }
+                                    newPerf.setEventName(eventConstantsName);
+                                    newPerf.setAthlete(athlete);
+                                    newPerf.setYear(year);
+                                    newPerf.setSchool(school);
+                                    newPerf.setDisplayMark(rawMark);
+                                    newPerf.setDecimalMark(decimalMark);
+                                    newPerf.setPoints(points);
+                                    newPerf.setWeekNumber(weekNumber);
+                                    return performanceRepository.save(newPerf);
+                                });
+                        if (isFinal) {
+                            perf.setPlace(place);
+                        }
+                        if (points > perf.getPoints()) {
+                            perf.setPoints(points);
+                            perf.setDecimalMark(decimalMark);
+                            perf.setDisplayMark(rawMark);
+                        }
+                        performanceRepository.save(perf);
+                    } else {
+                        Performance perf = new Performance();
+                        perf.setEventName(eventConstantsName);
+                        perf.setPlace(place);
+                        perf.setAthlete(athlete);
+                        perf.setYear(year);
+                        perf.setSchool(school);
+                        perf.setDisplayMark(rawMark);
+                        perf.setDecimalMark(decimalMark);
+                        perf.setPoints(points);
+                        perf.setWeekNumber(weekNumber);
+
+                        performanceRepository.save(perf);
+                    }
                 }
             }
 
@@ -230,7 +230,7 @@ public class TfrrsScraperService {
      * Preseason-style roster scrape.
      * Reads a TFRRS roster page, creates/updates all athletes for that team,
      * stores tfrrsUrl/tfrrsId, and populates each athlete's best event.
-     *
+     * <p>
      * gender should be "mens" or "womens"
      */
     public void scrapeRoster(String rosterUrl, String gender) {
@@ -613,4 +613,205 @@ public class TfrrsScraperService {
         return cleaned;
     }
 
+    /**
+     * Existing meet scraper.
+     * This remains focused on reading meet results and saving Performances.
+     */
+    public void scrapeLeagueMeet(String meetUrl, FantasyLeague league) {
+        try {
+            Document doc = Jsoup.connect(meetUrl)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    .get();
+
+            Set<String> hiddenClasses = new HashSet<>();
+            Elements styleTags = doc.select("style");
+            Pattern pattern = Pattern.compile("\\.([a-zA-Z0-9_-]+)\\s*\\{[^}]*display:\\s*none");
+
+            for (Element style : styleTags) {
+                Matcher matcher = pattern.matcher(style.data());
+                while (matcher.find()) {
+                    hiddenClasses.add(matcher.group(1));
+                }
+            }
+
+            Elements eventHeaders = doc.select("h3");
+            if (!eventHeaders.isEmpty()) {
+                eventHeaders.remove(0);
+            }
+
+
+            for (Element h3 : eventHeaders) {
+                String eventName = h3.text().trim().toUpperCase();
+
+                // Skip events not currently supported in fantasy scoring
+                if (eventName.toUpperCase().contains("RELAY")) {
+                    continue;
+                }
+
+                boolean isPrelim = eventName.toUpperCase().contains("PRELIM");
+                boolean isFinal = eventName.toUpperCase().contains("FINAL");
+                if (eventName.contains(",")) {
+                    eventName = eventName.replace(",", "");
+                }
+                if (eventName.contains("FINALS")) {
+                    eventName = eventName.replace(" FINALS", "");
+                } else if (eventName.contains("PRELIMINARIES")) {
+                    eventName = eventName.replace(" PRELIMINARIES", "");
+                } else if (eventName.contains("FINAL")) {
+                    eventName = eventName.replace(" FINAL", "");
+                } else if (eventName.contains("PRELIMS")) {
+                    eventName = eventName.replace(" PRELIMS", "");
+                } else if (eventName.contains("PRELIM")) {
+                    eventName = eventName.replace(" PRELIM", "");
+                }
+
+                Element tableWrapper = h3.parent();
+                if (tableWrapper == null) {
+                    continue;
+                }
+
+                Element table = tableWrapper.nextElementSiblings().select("table").first();
+                if (table == null) {
+                    continue;
+                }
+
+                Element headerRow = table.selectFirst("thead tr");
+                if (headerRow == null) {
+                    continue;
+                }
+
+                Elements headers = headerRow.select("th");
+                int timeOrMarkIndex = -1;
+                boolean isTrackEvent = true;
+
+                for (int j = 0; j < headers.size(); j++) {
+                    Element th = headers.get(j);
+                    boolean isHidden = false;
+
+                    for (String className : th.classNames()) {
+                        if (hiddenClasses.contains(className)) {
+                            isHidden = true;
+                            break;
+                        }
+                    }
+
+                    if (!isHidden) {
+                        String headerText = th.text().trim().toUpperCase();
+                        if (headerText.equals("TIME")) {
+                            timeOrMarkIndex = j;
+                            break;
+                        } else if (headerText.equals("MARK") || headerText.equals("POINTS")) {
+                            timeOrMarkIndex = j;
+                            isTrackEvent = false;
+                            break;
+                        }
+                    }
+                }
+
+                Elements rows = table.select("tbody tr");
+
+                for (Element row : rows) {
+                    Elements columns = row.select("td");
+
+                    if (timeOrMarkIndex == -1 || columns.size() <= timeOrMarkIndex) {
+                        continue;
+                    }
+
+                    String place = columns.get(0).text().trim();
+                    String athleteName = columns.get(1).text().trim();
+                    String year = columns.get(2).text().trim();
+                    String school = normalizeSchoolName(columns.get(3).text().trim());
+                    String rawMark = columns.get(timeOrMarkIndex).text().trim();
+
+                    if (year.isEmpty() || school.equalsIgnoreCase("Unattached") || athleteName.isEmpty()) {
+                        continue;
+                    }
+
+                    Athlete athlete = athleteRepository.findByNameIgnoreCaseAndSchoolIgnoreCase(athleteName, school)
+                            .orElseGet(() -> {
+                                Athlete newAthlete = new Athlete();
+                                newAthlete.setName(athleteName);
+                                newAthlete.setSchool(school);
+                                return athleteRepository.save(newAthlete);
+                            });
+
+                    Double decimalMark = PerformanceParser.parseMarkToDecimal(rawMark, eventName);
+                    int points;
+
+                    if (decimalMark != null && eventConstants != null) {
+                        if (isTrackEvent) {
+                            points = WorldAthleticsCalculator.calculateTrackPoints(
+                                    decimalMark,
+                                    eventConstants.getA(),
+                                    eventConstants.getB(),
+                                    eventConstants.getC()
+                            );
+                        } else {
+                            points = WorldAthleticsCalculator.calculateFieldPoints(
+                                    decimalMark,
+                                    eventConstants.getA(),
+                                    eventConstants.getB(),
+                                    eventConstants.getC()
+                            );
+                        }
+                    } else {
+                        continue;
+                    }
+
+                    if (isPrelim || isFinal) {
+                        System.out.println(eventName);
+                        Optional<Performance> testPerf = performanceRepository.findByAthleteAndEventNameIgnoreCaseAndWeekNumber(athlete, eventName, weekNumber);
+                        if (testPerf.isPresent()) {
+                            System.out.println(testPerf.get());
+                            System.out.println(testPerf.get().getPoints());
+                        }
+                        Performance perf = performanceRepository.findByAthleteAndEventNameIgnoreCaseAndWeekNumber(athlete, eventConstantsName, weekNumber)
+                                .orElseGet(() -> {
+                                    Performance newPerf = new Performance();
+                                    if (isFinal) {
+                                        newPerf.setPlace(place);
+                                    }
+                                    newPerf.setEventName(eventConstantsName);
+                                    newPerf.setAthlete(athlete);
+                                    newPerf.setYear(year);
+                                    newPerf.setSchool(school);
+                                    newPerf.setDisplayMark(rawMark);
+                                    newPerf.setDecimalMark(decimalMark);
+                                    newPerf.setPoints(points);
+                                    newPerf.setWeekNumber(weekNumber);
+                                    return performanceRepository.save(newPerf);
+                                });
+                        if (isFinal) {
+                            perf.setPlace(place);
+                        }
+                        if (points > perf.getPoints()) {
+                            perf.setPoints(points);
+                            perf.setDecimalMark(decimalMark);
+                            perf.setDisplayMark(rawMark);
+                        }
+                        performanceRepository.save(perf);
+                    } else {
+                        Performance perf = new Performance();
+                        perf.setEventName(eventConstantsName);
+                        perf.setPlace(place);
+                        perf.setAthlete(athlete);
+                        perf.setYear(year);
+                        perf.setSchool(school);
+                        perf.setDisplayMark(rawMark);
+                        perf.setDecimalMark(decimalMark);
+                        perf.setPoints(points);
+                        perf.setWeekNumber(weekNumber);
+
+                        performanceRepository.save(perf);
+                    }
+                }
+            }
+
+            System.out.println("Successfully scraped, scored, and saved data from: " + meetUrl);
+
+        } catch (IOException e) {
+            System.err.println("Failed to scrape TFRRS: " + e.getMessage());
+        }
+
+    }
 }

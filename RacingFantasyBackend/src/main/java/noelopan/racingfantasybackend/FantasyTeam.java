@@ -13,6 +13,9 @@ public class FantasyTeam {
     private Long id;
 
     private String teamName;
+    private int rosterSize;
+    private int conferencePoints;
+    private boolean conferenceQualified = false;
 
     // 1. Which User owns this team?
     @ManyToOne
@@ -43,7 +46,27 @@ public class FantasyTeam {
     public FantasyUser getOwner() { return owner; }
     public void setOwner(FantasyUser owner) { this.owner = owner; }
     public FantasyLeague getLeague() { return league; }
-    public void setLeague(FantasyLeague league) { this.league = league; }
+    public void setLeague(FantasyLeague league) {
+        this.league = league;
+        this.rosterSize = league.getRosterSize();
+    }
     public List<Athlete> getRoster() { return roster; }
     public void setRoster(List<Athlete> roster) { this.roster = roster; }
+    public int getRosterSize() { return rosterSize; }
+    public void setRosterSize(int rosterSize) { this.rosterSize = rosterSize; }
+    public int getConferencePoints(){
+        return conferencePoints;
+    }
+    public void setConferencePoints(int conferencePoints){
+        this.conferencePoints = conferencePoints;
+    }
+    public void incrementConferencePoints(int athletePoints){
+        conferencePoints += athletePoints;
+    }
+    public boolean isConferenceQualified(){
+        return conferenceQualified;
+    }
+    public void setConferenceQualified(boolean conferenceQualified){
+        this.conferenceQualified = conferenceQualified;
+    }
 }
