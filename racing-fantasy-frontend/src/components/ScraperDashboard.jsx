@@ -77,7 +77,7 @@ export default function ScraperDashboard() {
 
     return (
         <div className="scraper-card">
-            <h2>Data Scraper Control Center</h2>
+            <h2>Data Scraper Control Center (NOELOPAN ONLY)</h2>
 
             <div className="scraper-sections">
                 <div className="scraper-subcard">

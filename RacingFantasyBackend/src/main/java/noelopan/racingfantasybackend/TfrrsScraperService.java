@@ -197,7 +197,6 @@ public class TfrrsScraperService {
                                 perf.setPlace(place);
                             }
                             if(points > perf.getPoints()){
-                                System.out.println(athleteName + ": Previous perf points:" + perf.getPoints() + ", current Points: " + points);
                                 perf.setPoints(points);
                                 perf.setDecimalMark(decimalMark);
                                 perf.setDisplayMark(rawMark);

@@ -176,4 +176,16 @@ public class FantasyTeamController {
         teamRepository.deleteAll();
         return ResponseEntity.ok("Successfully deleted all teams");
     }
+
+    @PutMapping("/updateName/{teamId}")
+    public ResponseEntity<String> updateTeamName(@PathVariable long teamId, @RequestParam String teamName) {
+        Optional<FantasyTeam> teamOpt = teamRepository.findById(teamId);
+        if (teamOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Error: Team not found.");
+        }
+        FantasyTeam team = teamOpt.get();
+        team.setTeamName(teamName);
+        teamRepository.save(team);
+        return ResponseEntity.ok("Successfully updated team with ID: " + teamId);
+    }
 }

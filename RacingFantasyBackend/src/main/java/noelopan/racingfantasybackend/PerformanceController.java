@@ -63,14 +63,14 @@ public class PerformanceController {
      * DELETE /api/performances/{id}
      * Deletes a specific performance by its ID.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePerformance(@PathVariable Long id) {
-        if (!performanceRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        performanceRepository.deleteById(id);
-        return ResponseEntity.ok("Successfully deleted performance with ID: " + id);
-    }
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<String> deletePerformance(@PathVariable Long id) {
+//        if (!performanceRepository.existsById(id)) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        performanceRepository.deleteById(id);
+//        return ResponseEntity.ok("Successfully deleted performance with ID: " + id);
+//    }
 
     /**
      * DELETE /api/performances
@@ -80,5 +80,16 @@ public class PerformanceController {
     public ResponseEntity<String> deleteAllPerformances() {
         performanceRepository.deleteAll();
         return ResponseEntity.ok("All performances have been wiped clean.");
+    }
+
+    /**
+     * DELETE /api/performances/{weekNumber}
+     * Deletes all the recorded performances for a given week
+     */
+    @DeleteMapping("/{weekNumber}")
+    public ResponseEntity<String> deletePerformanceByWeekNumber(@PathVariable Integer weekNumber) {
+        // try
+        performanceRepository.deleteAllByWeekNumber(weekNumber);
+        return ResponseEntity.ok("All performances have been wiped clean for week " + weekNumber);
     }
 }
